@@ -41,7 +41,7 @@ public class AccountsBean implements Serializable {
      * кладет его в переменную id.
      * Читает имя пользователя по id.
      * Получает список всех счетов выбранного пользователя.
-     *//
+     */
     @PostConstruct
     public void init() {
 
