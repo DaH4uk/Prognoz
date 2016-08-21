@@ -4,12 +4,11 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import ru.prognoz.entities.AccountEntity;
-
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import java.util.List;
 
-/**
+/*
  * @author:  Туров Данил
  * Дата создания date: 16.08.2016
  * Реализует data access object для AccountEntity,
