@@ -14,10 +14,10 @@ import javax.persistence.*;
 @Entity
 @Table(name = "clients", schema = "prognoz", catalog = "")
 public class ClientsEntity {
-    private int id;
-    private String name;
-    private String address;
-    private Integer age;
+    private int id; //id клиента
+    private String name;    //ФИО клиента
+    private String address; //Адрес клиента
+    private Integer age;    //возраст
 
 
     @Id
