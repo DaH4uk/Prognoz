@@ -7,6 +7,7 @@ import org.primefaces.event.SelectEvent;
 import ru.prognoz.DAO.ClientsDAO;
 import ru.prognoz.entities.ClientsEntity;
 import ru.prognoz.hibertane.utils.HibernateSessionFactory;
+
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
@@ -18,12 +19,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by turov on 06.08.2016.
- * Бин, реализующий функционал страницы index.html
+ * @author:  Туров Данил
+ * Дата создания: 06.08.2016
+ * Реализует методы для управления формой index.xhtml.
+ * The Prognoz Test Project
  */
 
 
-@ManagedBean(name = "indexView")  //имя бина, используется для ссылки из xhtml файла на этот бин
+@ManagedBean(name = "indexView")
 @ViewScoped
 public class IndexBean implements Serializable {
     private List<ClientsEntity> clients;  //список пользователей
@@ -33,26 +36,35 @@ public class IndexBean implements Serializable {
 
 
 
-    //при инициализации бина читаем список всех клиентов и кладем его в список пользователей
+    /**
+     * При инициализации бина читаем список всех клиентов из БД и кладем его в clients
+     */
     @PostConstruct
     public void init() {
         clients = clientsDAO.readAll();
     }
 
-
-    //метод вызывается при клике на строке в столбце, выполняет редирект на страницу /accounts и кладет в параметры id выбранного клиента
+    /**
+     * вызывается при клике на строке в столбце,
+     * выполняет редирект на страницу /accounts 
+     * и кладет в url id выбранного клиента
+     * @param событие нажатия на строку в таблице
+     */
     public void onRowSelect(SelectEvent event) {
-        int id = ((ClientsEntity) event.getObject()).getId();
+        int id = ((ClientsEntity) event.getObject()).getId();   //Получаем id выбранного объекта
 
         try {
-            FacesContext.getCurrentInstance().getExternalContext().redirect("accounts?id="+id); //сам редирект
+            FacesContext.getCurrentInstance().getExternalContext().redirect("accounts?id="+id); //выполняем редирект на url /accounts?id="id клиента"
         } catch (IOException e) {
             //TODO: реализовать вывод в лог
             e.printStackTrace();
         }
     }
-
-    //метод вызывается при нажатии на кнопку "Добавить клиента"
+    
+    /**
+     * вызывается при нажатии на кнопку "Добавить клиента"
+     * Формирует форму добавления клиента из файла addClientDialog.xhtml
+     */
     public void addClient() {
         //устанавливаются параметры диалогового окна
         Map<String, Object> options = new HashMap<>();
@@ -66,7 +78,6 @@ public class IndexBean implements Serializable {
         //открывается диалоговое окно, во внутрь которого вставляется "addClientDialog.xhtml"
         RequestContext.getCurrentInstance().openDialog("addClientDialog", options, null);
     }
-
 
     public List<ClientsEntity> getClients() {
         return clients;
