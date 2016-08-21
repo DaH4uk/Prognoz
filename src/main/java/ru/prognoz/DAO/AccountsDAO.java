@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * @author:  Туров Данил
- * Дата создания date: 16.08.2016
+ * Дата создания: 16.08.2016
  * Реализует data access object для AccountEntity,
  * скрывает реализацию методов для доступа к сущностям счетов клиентов.
  * The Prognoz Test Project
