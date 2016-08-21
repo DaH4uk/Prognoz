@@ -6,19 +6,23 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 /**
- * Created by turov on 20.08.2016.
+ * @author:  Туров Данил
+ * Дата создания: 20.08.2016
+ * Реализует сущность транзакции.
+ * Содержит поля, сеттеры и геттеры для соответствующих полей в таблице.
+ * The Prognoz Test Project
  */
 @Entity
 @Table(name = "transactions", schema = "prognoz")
 public class TransactionsEntity {
-    private int transactionId;
-    private int writeoffAccountId;
-    private Integer refillAccountId;
-    private double sum;
-    private Timestamp transactionTime;
-    private String decription;
+    private int transactionId;  //id транзакции
+    private int writeoffAccountId;  //счет списания
+    private Integer refillAccountId;    //Счет зачисления
+    private double sum; //сумма
+    private Timestamp transactionTime;  //дата/время транзакции
+    private String decription;  //описание
 
-
+    //автоинкремент поля
     @Id
     @GenericGenerator(name="kaugen" , strategy="increment")
     @GeneratedValue(generator="kaugen")
