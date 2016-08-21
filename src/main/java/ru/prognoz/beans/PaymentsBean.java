@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author:  Туров Данил
  * Дата создания: 16.08.2016
- * Реализует методы для управления accounts.xhtml.
+ * Реализует методы для управления формой платежи.
  * The Prognoz Test Project
  */
 @ManagedBean(name = "paymentsView")
