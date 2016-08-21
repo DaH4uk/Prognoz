@@ -22,22 +22,28 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by turov on 17.08.2016.
+ * @author:  Туров Данил
+ * Дата создания: 17.08.2016
+ * Реализует методы для управления формой пополнения счета.
+ * The Prognoz Test Project
  */
-
-@ManagedBean(name = "rechargeView")  //имя бина, используется для ссылки из xhtml файла на этот бин
+@ManagedBean(name = "rechargeView")
 @ViewScoped
 public class RechargeBean implements Serializable {
     private Session session = HibernateSessionFactory.getSessionFactory().openSession();  //при загрузке бина, создается сессия с бд через Hibernate
-    private TransactionsDAO transactionsDAO = new TransactionsDAO(session);  // создается объект Data Access object для доступа к сущностям из базы
-    private AccountsDAO accountsDAO = new AccountsDAO(session);
-    private List<AccountEntity> accountsList;
-    private List<SelectItem> accountIdSelfList;
-    private int id;
-    private int depositingAccountId;
-    private double sum;
+    private TransactionsDAO transactionsDAO = new TransactionsDAO(session);  // создается объект Data Access object для доступа к сущностям транзакций из базы
+    private AccountsDAO accountsDAO = new AccountsDAO(session); // создается объект Data Access object для доступа к сущностям счетов из базы
+    private List<AccountEntity> accountsList;   //Список счетов
+    private List<SelectItem> accountIdSelfList; //Список счетов клиента для доступа из selectOne формы
+    private int id; //id клиента
+    private int depositingAccountId;    //id пополняемого счета
+    private double sum; //Сумма пополнения
 
-
+    /**
+     * При инициализации формы берем id из параметров сессии
+     * читаем список всех счетов у выбранного клиента
+     * Кладем их в accountIdSelfList.
+     */
     @PostConstruct
     public void init() {
         this.id = (int) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("id");
@@ -45,39 +51,45 @@ public class RechargeBean implements Serializable {
         this.accountsList = accountsDAO.readByAccountID(id);
         accountIdSelfList = new ArrayList<>();
         for (AccountEntity accountEntity : accountsList) {
-
+            //TODO: Можно добавить сумму
             accountIdSelfList.add(new SelectItem(accountEntity.getId(), accountEntity.getId() + ""));
         }
     }
-
+    
+    /**
+     * Вызывается при нажатии на кнопку "Пополнить" в форме.
+     * Изменяет сумму на счету клиента
+     * И сохраняет транзакцию в БД.
+     */
     public void recharge() {
 
         if (sum > 0) {
-            Transaction transaction = session.beginTransaction();   //Начало транзакции
+            try {
+                Transaction transaction = session.beginTransaction();   //Начало транзакции
 
-            AccountEntity accountEntity = accountsDAO.read(depositingAccountId);
+                AccountEntity accountEntity = accountsDAO.read(depositingAccountId);    //читаем из бд объект счета
 
-            accountEntity.setSum(accountEntity.getSum() + sum);
+                accountEntity.setSum(accountEntity.getSum() + sum); //Изменяем сумму на счету
 
-            accountsDAO.save(accountEntity); //сохранение клиента
+                accountsDAO.save(accountEntity); //сохранение счета
 
-            TransactionsEntity transactionsEntity = new TransactionsEntity();
+                TransactionsEntity transactionsEntity = new TransactionsEntity();   //Создаем обхект новой транзакции
 
-            transactionsEntity.setRefillAccountId(depositingAccountId);
-            transactionsEntity.setSum(sum);
-            transactionsEntity.setTransactionTime(new Timestamp(new Date().getTime()));
-            transactionsEntity.setDecription("Пополнение счета");
+                transactionsEntity.setRefillAccountId(depositingAccountId); //добавляем счет пополнения
+                transactionsEntity.setSum(sum); //сумму пополнения
+                transactionsEntity.setTransactionTime(new Timestamp(new Date().getTime())); //текщую дату
+                transactionsEntity.setDecription("Пополнение счета");   //и описание операции
 
-            transactionsDAO.save(transactionsEntity);
+                transactionsDAO.save(transactionsEntity);   //сохраняем
 
-            transaction.commit(); // коммит
+                transaction.commit(); // коммит
 
-            RequestContext.getCurrentInstance().closeDialog(null); //закрывает диалоговое окно
+            RequestContext.getCurrentInstance().closeDialog(null); //закрываем диалоговое окно
+            } catch (Exception e) {
+                transaction.rollback(); //на случай исключения
+            }
 
-        } else {
-            FacesContext context = FacesContext.getCurrentInstance();
-            context.addMessage("growl2", new FacesMessage("Внимание!", "Вы указали один и тот же номер счета для списания и зачисления средств. Пожалуйста, проверьте номер счета списания и номер счета зачисления. Они должны быть различны."));
-        }
+        } 
 
     }
 
