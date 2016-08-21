@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * @author:  Туров Данил
- * Дата создания date: 06.08.2016
+ * Дата создания: 06.08.2016
  * Реализует data access object для ClientsDAO,
  * скрывает реализацию методов для доступа к объектам клиентов.
  * The Prognoz Test Project
