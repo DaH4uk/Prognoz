@@ -22,24 +22,31 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by turov on 17.08.2016.
+ * @author:  Туров Данил
+ * Дата создания: 16.08.2016
+ * Реализует методы для управления accounts.xhtml.
+ * The Prognoz Test Project
  */
-
-@ManagedBean(name = "paymentsView")  //имя бина, используется для ссылки из xhtml файла на этот бин
+@ManagedBean(name = "paymentsView")
 @ViewScoped
 public class PaymentsBean implements Serializable {
     private Session session = HibernateSessionFactory.getSessionFactory().openSession();  //при загрузке бина, создается сессия с бд через Hibernate
-    private TransactionsDAO transactionsDAO = new TransactionsDAO(session);  // создается объект Data Access object для доступа к сущностям из базы
-    private AccountsDAO accountsDAO = new AccountsDAO(session);
-    private List<AccountEntity> accountsList;
-    private List<SelectItem> accountIdSelfList;
-    private int id;
-    private int writeOffAccountId;
-    private double sum;
-    private String service;
-    private int accountNumber;
+    private TransactionsDAO transactionsDAO = new TransactionsDAO(session);  // создается объект Data Access object для доступа к сущностям транзакций из базы
+    private AccountsDAO accountsDAO = new AccountsDAO(session); // создается объект Data Access object для доступа к сущностям счетов из базы
+    private List<AccountEntity> accountsList;   //Список счетов
+    private List<SelectItem> accountIdSelfList; //Список счетов выбранного клиента для формы selectone
+    private int id; //id клиента
+    private int writeOffAccountId;  //id счета, с которого будет произведено списание средств
+    private double sum; //Сумма списания
+    //TODO: WTF?
+    private String service; //Название услуги 
+    private int accountNumber;  //Номер счета
 
-
+    /**
+     * При инициализации формы из параметров сессии получаем id.
+     * Читаем список счетов по id пользователя
+     * и кладем его в список selectOne.
+     */
     @PostConstruct
     public void init() {
         this.id = (int) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("id");
@@ -47,33 +54,43 @@ public class PaymentsBean implements Serializable {
         this.accountsList = accountsDAO.readByAccountID(id);
         accountIdSelfList = new ArrayList<>();
         for (AccountEntity accountEntity : accountsList) {
-
-            accountIdSelfList.add(new SelectItem(accountEntity.getId(), accountEntity.getId() + ""));
+            //TODO: Можно добавить сумму
+            accountIdSelfList.add(new SelectItem(accountEntity.getId(), accountEntity.getId() + " "));
         }
     }
 
+    /**
+     * Вызывается при нажатии на кнопку оплатить
+     * Изменяет сумму на счету клиента и записывает в бд новую транзакцию.
+     */
     public void pay() {
         AccountEntity accountEntity = accountsDAO.read(writeOffAccountId);
         if (sum > accountEntity.getSum() && sum > 0) {
-            Transaction transaction = session.beginTransaction();   //Начало транзакции
+            try{
+                Transaction transaction = session.beginTransaction();   //Начало транзакции
 
 
-            accountEntity.setSum(accountEntity.getSum() - sum);
+                accountEntity.setSum(accountEntity.getSum() - sum); //Получаем текущую сумму на счету клиента и вичитаем из него суппу платежа
 
-            accountsDAO.save(accountEntity); //сохранение клиента
+                accountsDAO.save(accountEntity); //изменение счета
 
-            TransactionsEntity transactionsEntity = new TransactionsEntity();
+                TransactionsEntity transactionsEntity = new TransactionsEntity();   //Создаем объект новой транзакции
 
-            transactionsEntity.setWriteoffAccountId(writeOffAccountId);
-            transactionsEntity.setSum(sum);
-            transactionsEntity.setTransactionTime(new Timestamp(new Date().getTime()));
-            transactionsEntity.setDecription("Оплата услуги " + service +". № счета: " + accountNumber);
+                transactionsEntity.setWriteoffAccountId(writeOffAccountId); //Пишем аккаунт, с которого будем списывать средства
+                transactionsEntity.setSum(sum); //Сумму списания
+                transactionsEntity.setTransactionTime(new Timestamp(new Date().getTime())); //Пишем текущую дату
+                transactionsEntity.setDecription("Оплата услуги " + service +". № счета: " + accountNumber);    //Добавляем описание
 
-            transactionsDAO.save(transactionsEntity);
+                transactionsDAO.save(transactionsEntity);   //И сохраняем все это дело
 
-            transaction.commit(); // коммит
+                transaction.commit(); // коммит
 
-            RequestContext.getCurrentInstance().closeDialog(null); //закрывает диалоговое окно
+                RequestContext.getCurrentInstance().closeDialog(null); //закрывает диалоговое окно
+            } catch (Exception e){
+                transaction.rollback;
+                //TODO: realise.
+            }
+
 
         }
 
