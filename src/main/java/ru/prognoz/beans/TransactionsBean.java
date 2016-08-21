@@ -21,23 +21,32 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by turov on 21.08.2016.
+ * @author:  Туров Данил
+ * Дата создания: 21.08.2016
+ * Реализует методы для управления формой с транзакциями.
+ * The Prognoz Test Project
  */
 @ManagedBean(name = "transactionsView")
 @ViewScoped
 public class TransactionsBean implements Serializable {
-    private List<TransactionsEntity> transactions;
-    private List<ClientsEntity> clientsEntities;
-    private List<SelectItem> clientList;
-    private AccountEntity selectedTransaction;
-    private String clientName;
-    private Session session = HibernateSessionFactory.getSessionFactory().openSession();
-    private ClientsDAO clientsDAO = new ClientsDAO(session);
-    private TransactionsDAO transactionsDAO = new TransactionsDAO(session);
-    private int id;
-    private Date dateFrom;
-    private Date dateTo;
+    private List<TransactionsEntity> transactions;  //Список транзакций
+    private List<ClientsEntity> clientsEntities;    //Список объектов с клиентами
+    private List<SelectItem> clientList;    //список клиентов для формы selectOne
+    private AccountEntity selectedTransaction;  //выбранная транзакция //TODO:WTF????
+    private String clientName;  //Имя клиента
+    private Session session = HibernateSessionFactory.getSessionFactory().openSession();    //Получаем сессию
+    private ClientsDAO clientsDAO = new ClientsDAO(session);    //Получаем DAO с текущей сессией для доступа к списку клиентов
+    private TransactionsDAO transactionsDAO = new TransactionsDAO(session); //Получаем DAO с текущей сессией для доступа к списку транзакций
+    private int id; //id выбранного клиента
+    private Date dateFrom;  //дата начала периода для поиска
+    private Date dateTo;    //дата конца периода для поиска
 
+    /**
+     * При инициализации формы из url запроса берем id клиента, по которому будем выводить список транзакций
+     * Если поле пусто, выводим информацию по всем
+     * Получаем список всех клиентов, для формы поиска
+     * //TODO: Добавить чтение параметров из запроса dateFrom и dateTo.
+     */
     @PostConstruct
     public void init() {
 
@@ -61,7 +70,8 @@ public class TransactionsBean implements Serializable {
         }
 
     }
-
+    
+    //TODO: Реализовать метод поиска.
     public void search(){
 
     }
