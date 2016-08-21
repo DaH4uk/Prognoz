@@ -14,9 +14,9 @@ import javax.persistence.*;
 @Entity
 @Table(name = "accounts", schema = "prognoz")
 public class AccountEntity {
-    private int id;
-    private int client;
-    private double sum;
+    private int id; //id счета
+    private int client; //id клиента
+    private double sum; //сумма на счету
 
     @Id
     @GenericGenerator(name="kaugen" , strategy="increment")
