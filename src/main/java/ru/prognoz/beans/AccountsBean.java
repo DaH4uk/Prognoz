@@ -19,20 +19,29 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by turov on 16.08.2016.
+ * @author:  Туров Данил
+ * Дата создания: 16.08.2016
+ * Реализует методы для управления accounts.xhtml.
+ * The Prognoz Test Project
  */
 @ManagedBean(name = "accountsView")
 @ViewScoped
 public class AccountsBean implements Serializable {
-    private List<AccountEntity> accounts;
-    private AccountEntity selectedAccount;
-    private String clientName;
-    private Session session = HibernateSessionFactory.getSessionFactory().openSession();
-    private AccountsDAO accountsDAO = new AccountsDAO(session);
-    private ClientsDAO clientsDAO = new ClientsDAO(session);
-    private int id;
+    private List<AccountEntity> accounts;   //Список счетов клиента
+    private AccountEntity selectedAccount;  //Выбранный счет
+    private String clientName;  //Имя выбранного клиента
+    private Session session = HibernateSessionFactory.getSessionFactory().openSession();    //Сессия Hibernate создается при создании 
+    private AccountsDAO accountsDAO = new AccountsDAO(session); //Объект DAO
+    private ClientsDAO clientsDAO = new ClientsDAO(session);    //Объект DAO
+    private int id; //id текущего клиента
 
-
+    /**
+     * Инициализация accounts.xhtml
+     * Берет id из списка параметров в url, 
+     * кладет его в переменную id.
+     * Читает имя пользователя по id.
+     * Получает список всех счетов выбранного пользователя.
+     *//
     @PostConstruct
     public void init() {
 
@@ -47,6 +56,9 @@ public class AccountsBean implements Serializable {
 
     }
 
+    /**
+     * По клику в строке таблицы, перенаправляет на url: /transactions
+     */
     public void onRowSelect(SelectEvent event) {
         int id = ((AccountEntity) event.getObject()).getId();
 
@@ -58,7 +70,9 @@ public class AccountsBean implements Serializable {
         }
     }
 
-    //метод вызывается при нажатии на кнопку "Добавить клиента"
+    /**
+     * Метод вызывается при нажатии на кнопку "Добавить счет"
+     */
     public void addAccount() {
         //устанавливаются параметры диалогового окна
         Map<String, Object> options = new HashMap<>();
@@ -68,12 +82,16 @@ public class AccountsBean implements Serializable {
         options.put("contentWidth", "100%");
         options.put("contentHeight", "100%");
         options.put("headerElement", "customheader");
-
+        
+        //Кладет в сессию параметр id
         FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("id",id);
         //открывается диалоговое окно, во внутрь которого вставляется "addAccount.xhtml"
         RequestContext.getCurrentInstance().openDialog("addAccount", options, null);
     }
 
+    /**
+     * Вызывается при нажатии на кнопку "Перевести"
+     */
     public void openTransfers() {
         //устанавливаются параметры диалогового окна
         Map<String, Object> options = new HashMap<>();
@@ -84,13 +102,17 @@ public class AccountsBean implements Serializable {
         options.put("contentHeight", "100%");
         options.put("headerElement", "customheader");
 
+        //Кладет в сессию параметр id
         FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("id",id);
+        
         //открывается диалоговое окно, во внутрь которого вставляется "transfers.xhtml"
-
         RequestContext.getCurrentInstance().openDialog("transfers", options, null);
 
     }
 
+    /**
+     * Вызывается при нажатии на кнопку "Пополнить"
+     */
     public void openRecharge(){
         //устанавливаются параметры диалогового окна
         Map<String, Object> options = new HashMap<>();
@@ -101,13 +123,16 @@ public class AccountsBean implements Serializable {
         options.put("contentHeight", "100%");
         options.put("headerElement", "customheader");
 
+        //Кладет в сессию параметр id
         FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("id",id);
+        
         //открывается диалоговое окно, во внутрь которого вставляется "transfers.xhtml"
-
         RequestContext.getCurrentInstance().openDialog("recharge", options, null);
     }
 
-
+    /**
+     * Вызывается при нажатии на кнопку "Платежи"
+     */
     public void openPayments(){
         //устанавливаются параметры диалогового окна
         Map<String, Object> options = new HashMap<>();
@@ -118,15 +143,12 @@ public class AccountsBean implements Serializable {
         options.put("contentHeight", "100%");
         options.put("headerElement", "customheader");
 
+        //Кладет в сессию параметр id
         FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("id",id);
+        
         //открывается диалоговое окно, во внутрь которого вставляется "transfers.xhtml"
-
         RequestContext.getCurrentInstance().openDialog("payments", options, null);
     }
-
-
-
-
 
     public List<AccountEntity> getAccounts() {
         return accounts;
