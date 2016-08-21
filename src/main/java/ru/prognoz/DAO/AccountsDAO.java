@@ -18,6 +18,9 @@ import java.util.List;
 @ManagedBean(name = "UsersDAO")
 @ApplicationScoped
 public class AccountsDAO {
+    /**
+     * Текущая сессия
+     */
     private Session session;
 
     /**
