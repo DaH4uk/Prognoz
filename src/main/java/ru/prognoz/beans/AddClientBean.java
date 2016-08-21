@@ -14,44 +14,51 @@ import javax.faces.context.FacesContext;
 import java.io.Serializable;
 
 /**
- * Created by turov on 17.08.2016.
+ * @author:  Туров Данил
+ * Дата создания: 17.08.2016
+ * Реализует методы формы добавления клиента.
+ * The Prognoz Test Project
  */
 @ManagedBean(name = "addClientView")  //имя бина, используется для ссылки из xhtml файла на этот бин
 @ViewScoped
 public class AddClientBean implements Serializable {
     private Session session = HibernateSessionFactory.getSessionFactory().openSession();  //при загрузке бина, создается сессия с бд через Hibernate
-    private ClientsDAO clientsDAO = new ClientsDAO(session);  // создается объект Data Access object для доступа к сущностям из базы
+    private ClientsDAO clientsDAO = new ClientsDAO(session);  //создается объект Data Access object для доступа к сущностям из базы
     private String name;  //фио для формы создания нового клиента
     private String address;  //адрес для формы создания нового клиента
     private int age;    //возраст для формы создания нового клиента
 
-    //при инициализации бина читаем список всех клиентов и кладем его в список пользователей
+    /**
+     * При ининциализации формы ничего не делаем
+     */
     @PostConstruct
-    public void init() {
+    public void init() {/*NOPE*/}
+
+    /**
+     * Обрабатывает нажатие на кнопку "Сохранить" в диалоговом окне
+     * Сохраняет объект клиента в бд.
+     */
+    public void saveClient() {
+        try{
+            Transaction transaction = session.beginTransaction();   //Начало транзакции
+
+            ClientsEntity clientsEntity = new ClientsEntity();    //Создание сущности клиента
+            clientsEntity.setName(name);    //Установка полей имя и адрес клиента
+            clientsEntity.setAddress(address);
+
+            if (age > 0)
+                clientsEntity.setAge(age); //Если было изменено поле возраст
+
+            clientsDAO.save(clientsEntity); //сохранение клиента
+            transaction.commit(); // коммит
+
+            RequestContext.getCurrentInstance().closeDialog(); //закрывает диалоговое окно
+            //TODO: реализовать обновление главной формы
+        } catch(Exception e){
+            transaction.rollback();
+        }
 
     }
-
-    //метод вызывается при нажатии на кнопку "Сохранить" в диалоговом окне
-    public void saveClient(Object o) {
-
-        Transaction transaction = session.beginTransaction();   //Начало транзакции
-
-        ClientsEntity clientsEntity = new ClientsEntity();    //Создание сущности пользователя
-        clientsEntity.setName(name);
-        clientsEntity.setAddress(address);
-
-        if (age != 0)
-            clientsEntity.setAge(age); // если не было изменено поле возраст
-
-        clientsDAO.save(clientsEntity); //сохранение клиента
-        transaction.commit(); // коммит
-
-        RequestContext.getCurrentInstance().closeDialog(o); //закрывает диалоговое окно
-        FacesContext.getCurrentInstance().getPartialViewContext().getRenderIds().add("form");
-    }
-
-
-
 
     public String getName() {
         return name;
