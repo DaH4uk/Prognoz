@@ -18,7 +18,10 @@ import java.util.List;
 
 
 /**
- * Created by turov on 16.08.2016.
+ * @author:  Туров Данил
+ * Дата создания: 16.08.2016
+ * Реализует методы формы создания нового счета.
+ * The Prognoz Test Project
  */
 @ManagedBean(name = "addAccountView")
 @ViewScoped
@@ -28,26 +31,41 @@ public class AddAccountBean implements Serializable {
     private int id;
     private double sum;
 
+    /**
+     * Инициализация формы
+     * Берет id из списка параметров в url, 
+     * кладет его в переменную id.
+     */
     @PostConstruct
     public void init() {
         this.id = (int) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("id");
     }
+    
+    /**
+     * Вызывается при нажатии на кнопку "Сохранить" в диалоговом окне
+     * Сохраняет счет в бд
+     */
+    public void saveAccount() {
+        
+        try {
+            Transaction transaction = session.beginTransaction();   //Начало транкзакции
 
-    //метод вызывается при нажатии на кнопку "Сохранить" в диалоговом окне
-    public void saveAccount(Object o) {
-
-        Transaction transaction = session.beginTransaction();   //Начало транкзакции
-
-        AccountEntity accountEntity = new AccountEntity();    //Создание сущности пользователя
-        accountEntity.setClient(id);
-        accountEntity.setSum(sum);
+            AccountEntity accountEntity = new AccountEntity();    //Создание объекта нового счета
+            
+            accountEntity.setClient(id);    //установка его id и начальной суммы
+            accountEntity.setSum(sum);
 
 
-        accountsDAO.save(accountEntity); //сохранение клиента
-        transaction.commit(); // коммит
+            accountsDAO.save(accountEntity); //сохранение объекта счета в бд
+            transaction.commit(); // коммит
 
-        RequestContext.getCurrentInstance().closeDialog(o); //закрывает диалоговое окно
-        FacesContext.getCurrentInstance().getPartialViewContext().getRenderIds().add("form");
+            RequestContext.getCurrentInstance().closeDialog(null); //закрывает диалоговое окно
+            //TODO: Реализовать обновление формы
+        } catch (Exception e){
+            transaction.rollback(); //rollback в случае возникновения исключения
+            //TODO: Реализовать логгирование
+        }
+
     }
 
 
