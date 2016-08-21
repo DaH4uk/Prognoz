@@ -22,25 +22,32 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by turov on 17.08.2016.
+ * @author:  Туров Данил
+ * Дата создания: 17.08.2016
+ * Реализует методы для управления формой переводов.
+ * The Prognoz Test Project
  */
-
-@ManagedBean(name = "transfersBean")  //имя бина, используется для ссылки из xhtml файла на этот бин
+@ManagedBean(name = "transfersBean")
 @ViewScoped
 public class TransfersBean implements Serializable {
     private Session session = HibernateSessionFactory.getSessionFactory().openSession();  //при загрузке бина, создается сессия с бд через Hibernate
-    private TransactionsDAO transactionsDAO = new TransactionsDAO(session);  // создается объект Data Access object для доступа к сущностям из базы
-    private AccountsDAO accountsDAO = new AccountsDAO(session);
-    private List<AccountEntity> accountsList;
-    private List<SelectItem> accountIdList;
-    private List<SelectItem> accountIdSelfList;
-    private int id;
-    private int writeOffAccountId;
-    private int depositingAccountId;
-    private double sumTransfer;
-    private Object service;
+    private TransactionsDAO transactionsDAO = new TransactionsDAO(session);  // создается объект Data Access object для доступа к сущностям транзакций из базы
+    private AccountsDAO accountsDAO = new AccountsDAO(session);// создается объект Data Access object для доступа к сущностям счетов из базы
+    private List<AccountEntity> accountsList;   //Список счетов
+    private List<SelectItem> accountIdList; //Список счетов TODO: WTF?
+    private List<SelectItem> accountIdSelfList; //Список счетов для формы selectOne
+    private int id; //id клиента
+    private int writeOffAccountId;  //счет списания
+    private int depositingAccountId;    //счет пополнения
+    private double sumTransfer; //Сумма пополнения
+    private Object service; //Услуга TODO:WTF????
 
-
+    /**
+     * При инициализации формы из параметров сессии берем id
+     * Читаем список всех счетов
+     * Кладем его для формы selectOne в список всех счетов
+     * Аналогично для списка счетов выбранного клиента
+     */
     @PostConstruct
     public void init() {
         this.id = (int) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("id");
@@ -59,38 +66,46 @@ public class TransfersBean implements Serializable {
         }
     }
 
+    /**
+     * Вызывается при нажатии на кнопку "Перевести"
+     * Изменяет суммы на счете списания и пополнения, 
+     * так же создает запись о новой транзакции в бд.
+     */
     public void transfer() {
-        AccountEntity accountEntityWriteOff = accountsDAO.read(writeOffAccountId);
+        try {
+            AccountEntity accountEntityWriteOff = accountsDAO.read(writeOffAccountId);  //Читаем информацию о счете списания
 
-        if (writeOffAccountId != depositingAccountId && accountEntityWriteOff.getSum() > sumTransfer && sumTransfer > 0) {
-            Transaction transaction = session.beginTransaction();   //Начало транзакции
+            /**Проверяем, чтобы был выбран не один и тот же аккаунт,
+             * чтобы имеющаяся на счету сумма была больше суммы перевода,
+             * чтобы сумма перевода была положительная.
+             */
+            if (writeOffAccountId != depositingAccountId && accountEntityWriteOff.getSum() > sumTransfer && sumTransfer > 0) {
+                Transaction transaction = session.beginTransaction();   //Начало транзакции
+
+                accountEntityWriteOff.setSum(accountEntityWriteOff.getSum() - sumTransfer); //из текущей суммы на счету вычитаем сумму перевода
+                accountsDAO.save(accountEntityWriteOff); //сохранение состояния счета списания
 
 
-            accountEntityWriteOff.setSum(accountEntityWriteOff.getSum() - sumTransfer);
+                AccountEntity accountEntityDepositing = accountsDAO.read(depositingAccountId);  //читаем информацию о счете пополнения
+                accountEntityDepositing.setSum(accountEntityDepositing.getSum() + sumTransfer); //к текущей сумме на счету прибавляем сумму перевода
+                accountsDAO.save(accountEntityDepositing); //сохранение состояния счета пополнения
 
-            accountsDAO.save(accountEntityWriteOff); //сохранение клиента
+                TransactionsEntity transactionsEntity = new TransactionsEntity();   //Создание нового объекта транзакции
 
-            AccountEntity accountEntityDepositing = accountsDAO.read(depositingAccountId);
+                transactionsEntity.setWriteoffAccountId(writeOffAccountId); //Пишем в поле счет списания
+                transactionsEntity.setRefillAccountId(depositingAccountId); //счет пополнения
+                transactionsEntity.setSum(sumTransfer); //сумма перевода
+                transactionsEntity.setTransactionTime(new Timestamp(new Date().getTime())); //текущая дата/время
+                transactionsEntity.setDecription("Перевод другому клиенту");    //добавляем описание
 
+                transactionsDAO.save(transactionsEntity);   //сохраняем объект транзакции в бд
 
-            accountEntityDepositing.setSum(accountEntityDepositing.getSum() + sumTransfer);
+                transaction.commit(); // коммит
 
-            accountsDAO.save(accountEntityDepositing); //сохранение клиента
-
-            TransactionsEntity transactionsEntity = new TransactionsEntity();
-
-            transactionsEntity.setWriteoffAccountId(writeOffAccountId);
-            transactionsEntity.setRefillAccountId(depositingAccountId);
-            transactionsEntity.setSum(sumTransfer);
-            transactionsEntity.setTransactionTime(new Timestamp(new Date().getTime()));
-            transactionsEntity.setDecription("Перевод другому клиенту");
-
-            transactionsDAO.save(transactionsEntity);
-
-            transaction.commit(); // коммит
-
-            RequestContext.getCurrentInstance().closeDialog(null); //закрывает диалоговое окно
-
+                RequestContext.getCurrentInstance().closeDialog(null); //закрывает диалоговое окно
+            }
+        } catch (Exception e){
+            transaction.rollback(); //rollback в случае исключения
         }
 
     }
