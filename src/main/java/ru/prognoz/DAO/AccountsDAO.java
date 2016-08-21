@@ -8,7 +8,7 @@ import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import java.util.List;
 
-/*
+/**
  * @author:  Туров Данил
  * Дата создания date: 16.08.2016
  * Реализует data access object для AccountEntity,
@@ -20,12 +20,15 @@ import java.util.List;
 public class AccountsDAO {
     private Session session;
 
-    //Конструктор DAO
+    /**
+    * Конструктор DAO
+    * @param текущая сессия
+    */
     public AccountsDAO(Session session) {
         this.session = session;
     }
     
-    /*
+    /**
     * Реализует сохранение объекта в БД
     * @param AccountEntity для сохранения его в бд
     */
@@ -33,7 +36,7 @@ public class AccountsDAO {
         session.save(dataSet);
     }
 
-    /*
+    /**
     * Реализует чтение сущности счета из БД
     * @param id счета
     * @return объект счета  
@@ -42,7 +45,7 @@ public class AccountsDAO {
         return (AccountEntity) session.load(AccountEntity.class, id);
     }
 
-    /*
+    /**
     * Чтение списка счетов, принадлежащих клиенту
     * @param id клиента
     * @return List с обектами счетов
@@ -53,7 +56,7 @@ public class AccountsDAO {
         return (List<AccountEntity>) criteria.add(Restrictions.eq("client", id)).list();
     }
 
-    /*
+    /**
     * Чтение списка всех счетов
     * @return список объектов счетов
     */
