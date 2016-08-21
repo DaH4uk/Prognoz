@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+
+
+    <title>
+        Список транзакций
+    </title>
+
+
+</h:head>
+<h:body>
+    <f:view>
+        <h:form id="form">
+            <p:growl id="msgs" showDetail="true"/>
+            <p/>
+
+            <p:dataTable id="eventsDT" var="transaction" value="#{transactionsView.transactions}" selectionMode="single"
+                         selection="#{transactionsView.selectedTransaction}" rowKey="#{transaction.transactionId}">
+                <f:facet name="header">
+                    <p:outputLabel for="dateFrom" value="За период с   "/>
+                    <p:calendar id="dateFrom" value="#{transactionsView.dateFrom}" showOn="button"/>
+
+                    <p:outputLabel for="dateTo" value="   по   "/>
+                    <p:calendar id="dateTo" value="#{transactionsView.dateTo}" showOn="button" mindate="#{transactionsView.dateFrom}"/>
+
+                    <p:outputLabel for="clientName" value="   Выбрать клиента:  "/>
+                    <p:selectOneMenu id="clientName" value="#{transactionsView.id}" style="width:125px; top: 10px">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{transactionsView.clientList}"/>
+                    </p:selectOneMenu>
+                    <p/>
+
+                    <p:commandButton value="Поиск" icon="ui-icon-search" actionListener="#{transactionsView.search}"
+                                     update=":form:msgs"/>
+
+                </f:facet>
+                <!--<p:ajax event="rowSelect" listener="#{transactionsView.onRowSelect}" update=":form:msgs"/>-->
+
+                <p:column headerText="Id">
+                    <h:outputText value="#{transaction.transactionId}"/>
+                </p:column>
+                <p:column headerText="Счет списания">
+                    <h:outputText value="#{transaction.writeoffAccountId}"/>
+                </p:column>
+                <p:column headerText="Счет пополнения">
+                    <h:outputText value="#{transaction.refillAccountId}"/>
+                </p:column>
+                <p:column headerText="Сумма">
+                    <h:outputText value="#{transaction.sum}"/>
+                </p:column>
+                <p:column headerText="Дата">
+                    <h:outputText value="#{transaction.transactionTime}"/>
+                </p:column>
+                <p:column headerText="Описание">
+                    <h:outputText value="#{transaction.decription}"/>
+                </p:column>
+
+
+            </p:dataTable>
+
+
+        </h:form>
+    </f:view>
+</h:body>
+</html>

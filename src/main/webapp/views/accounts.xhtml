@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+
+
+    <title>
+        Счета клиента #{accountsView.clientName}
+    </title>
+
+
+</h:head>
+<h:body>
+    <f:view>
+        <h:form id="form">
+            <p:growl id="msgs" showDetail="true"/>
+            <p/>
+            <p:dataTable id="eventsDT" var="account" value="#{accountsView.accounts}" selectionMode="single"
+                         selection="#{accountsView.selectedAccount}" rowKey="#{account.id}">
+                <f:facet name="header">
+                    Выберите счет
+                </f:facet>
+                <p:ajax event="rowSelect" listener="#{accountsView.onRowSelect}" update=":form:msgs"/>
+
+                <p:column headerText="Id">
+                    <h:outputText value="#{account.id}"/>
+                </p:column>
+                <p:column headerText="Id владельца">
+                    <h:outputText value="#{account.client}"/>
+                </p:column>
+                <p:column headerText="Остаток">
+                    <h:outputText value="#{account.sum}"/>
+                </p:column>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Добавить счет" icon="ui-icon-plus" actionListener="#{accountsView.addAccount}" update=":form:msgs"/>
+                    <p:commandButton value="Перевести" icon="ui-icon-transferthick-e-w" actionListener="#{accountsView.openTransfers}" update=":form:msgs"/>
+                    <p:commandButton value="Пополнить" icon="ui-icon-arrow-1-s" actionListener="#{accountsView.openRecharge}" update=":form:msgs"/>
+                    <p:commandButton value="Платежи" icon="ui-icon-arrow-1-n" actionListener="#{accountsView.openPayments}" update=":form:msgs"/>
+                </f:facet>
+            </p:dataTable>
+
+
+
+
+        </h:form>
+    </f:view>
+</h:body>
+</html>

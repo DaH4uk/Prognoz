@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="dataSourceStorage">
+  <data-source name="MySQL - prognoz@localhost" uuid="7545a1f2-6d55-436f-a292-25a8790f32ec">
+    <database-info product="MySQL" version="5.7.14-log" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.35 ( Revision: 5fb9c5849535c13917c2cf9baaece6ef9693ef27 )">
+      <extra-name-characters>#@</extra-name-characters>
+      <identifier-quote-string>`</identifier-quote-string>
+    </database-info>
+    <case-sensitivity plain-identifiers="lower" quoted-identifiers="lower"/>
+    <database-model serializer="dbm" rdbms="MYSQL" format-version="2.6">
+      <schema id="1" name="prognoz">
+        <visible>1</visible>
+      </schema>
+      <schema id="2" name="information_schema"/>
+      <schema id="3" name="mysql"/>
+      <schema id="4" name="performance_schema"/>
+      <schema id="5" name="sakila"/>
+      <schema id="6" name="sys"/>
+      <schema id="7" name="world"/>
+      <table id="8" parent="1" name="hibernate_sequence"/>
+      <table id="9" parent="1" name="clients"/>
+      <table id="10" parent="1" name="accounts"/>
+      <column id="11" parent="8" name="next_val">
+        <data-type>bigint(20)|0</data-type>
+      </column>
+      <column id="12" parent="9" name="id">
+        <mandatory>1</mandatory>
+        <data-type>int(11)|0</data-type>
+      </column>
+      <column id="13" parent="9" name="address">
+        <mandatory>1</mandatory>
+        <data-type>varchar(200)|0</data-type>
+      </column>
+      <column id="14" parent="9" name="age">
+        <data-type>int(11)|0</data-type>
+      </column>
+      <column id="15" parent="9" name="name">
+        <data-type>varchar(200)|0</data-type>
+      </column>
+      <key id="16" parent="9" name="PRIMARY">
+        <columns>id</columns>
+        <primary>1</primary>
+      </key>
+      <column id="17" parent="10" name="id">
+        <mandatory>1</mandatory>
+        <data-type>int(11)|0</data-type>
+        <sequence-identity>1</sequence-identity>
+      </column>
+      <column id="18" parent="10" name="client">
+        <mandatory>1</mandatory>
+        <data-type>int(11)|0</data-type>
+      </column>
+      <column id="19" parent="10" name="sum">
+        <mandatory>1</mandatory>
+        <data-type>double|0</data-type>
+      </column>
+      <index id="20" parent="10" name="user_accounts_account_id_uindex">
+        <columns>id</columns>
+        <desc-columns></desc-columns>
+        <unique>1</unique>
+      </index>
+      <index id="21" parent="10" name="user_accounts_users_id_fk">
+        <columns>client</columns>
+        <desc-columns></desc-columns>
+      </index>
+      <key id="22" parent="10" name="PRIMARY">
+        <columns>id</columns>
+        <primary>1</primary>
+      </key>
+      <key id="23" parent="10" name="user_accounts_account_id_uindex">
+        <columns>id</columns>
+        <underlying-index>user_accounts_account_id_uindex</underlying-index>
+      </key>
+    </database-model>
+  </data-source>
+</component>

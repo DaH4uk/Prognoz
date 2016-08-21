@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+
+    <title>Пополнить</title>
+</h:head>
+<h:body>
+    <f:view>
+        <h:form id="form">
+
+            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+
+                <p:outputLabel for="depositingAccountId" value="Счет зачисления (id):"/>
+                <p/>
+                <p:selectOneMenu id="depositingAccountId" value="#{rechargeView.writeOffAccountId}" style="width:125px"
+                                 required="true">
+                    <f:selectItems value="#{rechargeView.accountIdSelfList}"/>
+                </p:selectOneMenu>
+                <br/>
+
+
+                <p:outputLabel value="Сумма:" for="sumTransfer"/>
+                <br/>
+                <p:inputText id="sumTransfer" value="#{rechargeView.sum}" required="true"/>
+                <p/>
+
+                <p:commandButton update="form" icon="ui-icon-check" value="Пополнить"
+                                 actionListener="#{rechargeView.recharge}"/>
+            </h:panelGrid>
+        </h:form>
+
+
+    </f:view>
+</h:body>
+</html>
