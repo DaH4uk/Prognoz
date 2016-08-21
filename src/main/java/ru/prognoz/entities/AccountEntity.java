@@ -5,7 +5,11 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 
 /**
- * Created by turov on 06.08.2016.
+ * @author:  Туров Данил
+ * Дата создания: 16.08.2016
+ * Реализует сущность счета клиента.
+ * Содержит поля, сеттеры и геттеры для соответствующих полей в таблице.
+ * The Prognoz Test Project
  */
 @Entity
 @Table(name = "accounts", schema = "prognoz")
