@@ -52,7 +52,7 @@ public class AccountsBean implements Serializable {
         id = Integer.parseInt(params.get("id"));
 
         clientName = clientsDAO.read(id).getName();
-        accounts = accountsDAO.readByAccountID(id);
+        accounts = accountsDAO.readByClientId(id);
 
     }
 
@@ -60,10 +60,8 @@ public class AccountsBean implements Serializable {
      * По клику в строке таблицы, перенаправляет на url: /transactions
      */
     public void onRowSelect(SelectEvent event) {
-        int id = ((AccountEntity) event.getObject()).getId();
-
         try {
-            FacesContext.getCurrentInstance().getExternalContext().redirect("transactions"); //сам редирект
+            FacesContext.getCurrentInstance().getExternalContext().redirect("transactions?id=" + id); //сам редирект
         } catch (IOException e) {
             //TODO: реализовать вывод в лог
             e.printStackTrace();

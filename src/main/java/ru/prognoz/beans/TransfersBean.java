@@ -10,7 +10,6 @@ import ru.prognoz.entities.TransactionsEntity;
 import ru.prognoz.hibertane.utils.HibernateSessionFactory;
 
 import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -58,7 +57,7 @@ public class TransfersBean implements Serializable {
             accountIdList.add(new SelectItem(accountEntity.getId(), accountEntity.getId() + ""));
         }
 
-        this.accountsList = accountsDAO.readByAccountID(id);
+        this.accountsList = accountsDAO.readByClientId(id);
         accountIdSelfList = new ArrayList<>();
         for (AccountEntity accountEntity : accountsList) {
 
@@ -72,6 +71,7 @@ public class TransfersBean implements Serializable {
      * так же создает запись о новой транзакции в бд.
      */
     public void transfer() {
+        Transaction transaction = session.beginTransaction();   //Начало транзакции
         try {
             AccountEntity accountEntityWriteOff = accountsDAO.read(writeOffAccountId);  //Читаем информацию о счете списания
 
@@ -80,7 +80,7 @@ public class TransfersBean implements Serializable {
              * чтобы сумма перевода была положительная.
              */
             if (writeOffAccountId != depositingAccountId && accountEntityWriteOff.getSum() > sumTransfer && sumTransfer > 0) {
-                Transaction transaction = session.beginTransaction();   //Начало транзакции
+
 
                 accountEntityWriteOff.setSum(accountEntityWriteOff.getSum() - sumTransfer); //из текущей суммы на счету вычитаем сумму перевода
                 accountsDAO.save(accountEntityWriteOff); //сохранение состояния счета списания

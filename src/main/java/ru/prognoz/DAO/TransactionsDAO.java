@@ -2,11 +2,13 @@ package ru.prognoz.DAO;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import ru.prognoz.entities.AccountEntity;
 import ru.prognoz.entities.TransactionsEntity;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +29,7 @@ public class TransactionsDAO {
 
     /**
     * Конструктор DAO
-    * @param текущая сессия
+    * @param session текущая сессия
     */
     public TransactionsDAO(Session session) {
         this.session = session;
@@ -35,7 +37,7 @@ public class TransactionsDAO {
 
     /**
     * Реализует сохранение объекта в БД
-    * @param TransactionsEntity для сохранения его в бд
+    * @param dataSet для сохранения его в бд
      */
     public void save(TransactionsEntity dataSet) {
         session.save(dataSet);
@@ -56,10 +58,19 @@ public class TransactionsDAO {
      * @return список транзакций
      */
      //TODO: переименовать корректно класс
-    public List<TransactionsEntity> readByTransactionID(int id) {
+    public List<TransactionsEntity> readByClientId(int id) {
         Criteria criteria = session.createCriteria(TransactionsEntity.class);
 
-        return (List<TransactionsEntity>) criteria.add(Restrictions.eq("transaction_id", id)).list();
+        AccountsDAO accountsDAO = new AccountsDAO(session);
+        List<AccountEntity> accountEntities = accountsDAO.readByClientId(id);
+        List<Integer> accountIdList = new ArrayList<>();
+
+        for (AccountEntity i : accountEntities){
+            accountIdList.add(i.getId());
+        }
+
+        return (List<TransactionsEntity>) criteria.add(Restrictions.or(Restrictions.in("writeoffAccountId", accountIdList.toArray()),
+                Restrictions.in("refillAccountId", accountIdList.toArray()))).list();
     }
 
     /**
@@ -73,13 +84,15 @@ public class TransactionsDAO {
 
     /**
      * Чтение транзакции по временному промежутку
-     * @param дата начала промежутка, дата конца промежутка
+     * @param dateFrom  дата начала промежутка, dateTo дата конца промежутка
      * @return список транзакций 
      */
     //TODO: реализовать корректно этот метод
     public List<TransactionsEntity> readByDate(Date dateFrom, Date dateTo){
         Criteria criteria = session.createCriteria(TransactionsEntity.class);
-        return (List<TransactionsEntity>) criteria.add(Restrictions.eq("TRANSACTION_TIME", dateFrom))
-                .add(Restrictions.eq("TRANSACTION_TIME",dateTo)).list();
+
+        Criterion range = Restrictions.between("transactionTime", dateFrom, dateTo);
+
+        return (List<TransactionsEntity>) criteria.add(range).list();
     }
 }

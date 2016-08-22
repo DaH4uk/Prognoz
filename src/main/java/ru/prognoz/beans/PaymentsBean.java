@@ -10,7 +10,6 @@ import ru.prognoz.entities.TransactionsEntity;
 import ru.prognoz.hibertane.utils.HibernateSessionFactory;
 
 import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -51,7 +50,7 @@ public class PaymentsBean implements Serializable {
     public void init() {
         this.id = (int) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("id");
 
-        this.accountsList = accountsDAO.readByAccountID(id);
+        this.accountsList = accountsDAO.readByClientId(id);
         accountIdSelfList = new ArrayList<>();
         for (AccountEntity accountEntity : accountsList) {
             //TODO: Можно добавить сумму
@@ -66,9 +65,8 @@ public class PaymentsBean implements Serializable {
     public void pay() {
         AccountEntity accountEntity = accountsDAO.read(writeOffAccountId);
         if (sum > accountEntity.getSum() && sum > 0) {
+            Transaction transaction = session.beginTransaction();//Начало транзакции
             try{
-                Transaction transaction = session.beginTransaction();   //Начало транзакции
-
 
                 accountEntity.setSum(accountEntity.getSum() - sum); //Получаем текущую сумму на счету клиента и вичитаем из него суппу платежа
 
@@ -87,7 +85,7 @@ public class PaymentsBean implements Serializable {
 
                 RequestContext.getCurrentInstance().closeDialog(null); //закрывает диалоговое окно
             } catch (Exception e){
-                transaction.rollback;
+                transaction.rollback();
                 //TODO: realise.
             }
 

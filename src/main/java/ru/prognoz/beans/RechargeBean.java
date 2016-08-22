@@ -10,7 +10,6 @@ import ru.prognoz.entities.TransactionsEntity;
 import ru.prognoz.hibertane.utils.HibernateSessionFactory;
 
 import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -48,7 +47,7 @@ public class RechargeBean implements Serializable {
     public void init() {
         this.id = (int) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("id");
 
-        this.accountsList = accountsDAO.readByAccountID(id);
+        this.accountsList = accountsDAO.readByClientId(id);
         accountIdSelfList = new ArrayList<>();
         for (AccountEntity accountEntity : accountsList) {
             //TODO: Можно добавить сумму
@@ -64,8 +63,9 @@ public class RechargeBean implements Serializable {
     public void recharge() {
 
         if (sum > 0) {
+            Transaction transaction = session.beginTransaction();   //Начало транзакции
             try {
-                Transaction transaction = session.beginTransaction();   //Начало транзакции
+
 
                 AccountEntity accountEntity = accountsDAO.read(depositingAccountId);    //читаем из бд объект счета
 

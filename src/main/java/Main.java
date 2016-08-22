@@ -30,10 +30,7 @@ public class Main {
         TransactionsDAO transactionsDAO = new TransactionsDAO(session);  // создается объект Data Access object для доступа к сущностям из базы
 
 
-        Date dateFrom = new Date(2016,6,15);
-        Date dateTo = new Date(2016,8,15);
-
-        List<TransactionsEntity> transactionsEntities = transactionsDAO.readByDate(dateFrom,dateTo);
+        List<TransactionsEntity> transactionsEntities = transactionsDAO.readByClientId(1);
 
         for(TransactionsEntity transactionsEntity: transactionsEntities){
             System.out.println(transactionsEntity.getTransactionId() + " " + transactionsEntity.getDecription());

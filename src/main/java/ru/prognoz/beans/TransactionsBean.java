@@ -14,6 +14,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,19 +54,31 @@ public class TransactionsBean implements Serializable {
         Map<String, String> params = FacesContext.getCurrentInstance()
                 .getExternalContext()
                 .getRequestParameterMap();
-        if (params.get(id)!=null){
-            id = Integer.parseInt(params.get("id"));
 
-            clientName = clientsDAO.read(id).getName();
-            transactions = transactionsDAO.readByTransactionID(id);
+        if (params.get("id") != null){
+            id = Integer.parseInt(params.get("id"));
+            transactions = transactionsDAO.readByClientId(id);
         } else {
-            transactions = transactionsDAO.readAll();
+            transactions = new ArrayList<>();
         }
+        if (params.get("dateFrom") != null && params.get("dateTo") != null){
+            dateFrom = new Date(Long.parseLong(params.get("dateFrom")));
+            dateTo = new Date(Long.parseLong(params.get("dateTo")));
+            List<TransactionsEntity> transactionsByDate = transactionsDAO.readByDate(dateFrom,dateTo);
+            for (TransactionsEntity entity : transactionsByDate){
+                transactions.add(entity);
+            }
+
+        }
+
         clientsEntities = clientsDAO.readAll();
         clientList = new ArrayList<>();
 
+        if (id == 0 && dateFrom ==null && dateTo == null){
+            transactions = transactionsDAO.readAll();
+        }
+
         for (ClientsEntity client: clientsEntities) {
-            System.out.println(client.getId());
             clientList.add(new SelectItem(client.getId(), client.getName()));
         }
 
@@ -73,6 +86,28 @@ public class TransactionsBean implements Serializable {
     
     //TODO: Реализовать метод поиска.
     public void search(){
+        if (dateFrom != null && dateTo != null && id==0){
+            try {
+                FacesContext.getCurrentInstance().getExternalContext().redirect("transactions?dateFrom=" +dateFrom.getTime() +"&dateTo=" + dateTo.getTime()); //сам редирект
+            } catch (IOException e) {
+                //TODO: реализовать вывод в лог
+                e.printStackTrace();
+            }
+        } else if(id != 0 && dateFrom == null && dateTo == null){
+            try {
+                FacesContext.getCurrentInstance().getExternalContext().redirect("transactions?id=" + id); //сам редирект
+            } catch (IOException e) {
+                //TODO: реализовать вывод в лог
+                e.printStackTrace();
+            }
+        } else if (dateFrom != null && dateTo != null && id!=0){
+            try {
+                FacesContext.getCurrentInstance().getExternalContext().redirect("transactions?id=" + id+"&dateFrom=" +dateFrom.getTime() +"&dateTo=" + dateTo.getTime()); //сам редирект
+            } catch (IOException e) {
+                //TODO: реализовать вывод в лог
+                e.printStackTrace();
+            }
+        }
 
     }
 

@@ -46,9 +46,9 @@ public class AddAccountBean implements Serializable {
      * Сохраняет счет в бд
      */
     public void saveAccount() {
-        
+        Transaction transaction = session.beginTransaction();   //Начало транкзакции
         try {
-            Transaction transaction = session.beginTransaction();   //Начало транкзакции
+
 
             AccountEntity accountEntity = new AccountEntity();    //Создание объекта нового счета
             

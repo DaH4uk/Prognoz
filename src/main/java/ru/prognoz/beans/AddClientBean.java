@@ -39,8 +39,9 @@ public class AddClientBean implements Serializable {
      * Сохраняет объект клиента в бд.
      */
     public void saveClient() {
+        Transaction transaction = session.beginTransaction();   //Начало транзакции
         try{
-            Transaction transaction = session.beginTransaction();   //Начало транзакции
+
 
             ClientsEntity clientsEntity = new ClientsEntity();    //Создание сущности клиента
             clientsEntity.setName(name);    //Установка полей имя и адрес клиента
@@ -52,7 +53,7 @@ public class AddClientBean implements Serializable {
             clientsDAO.save(clientsEntity); //сохранение клиента
             transaction.commit(); // коммит
 
-            RequestContext.getCurrentInstance().closeDialog(); //закрывает диалоговое окно
+            RequestContext.getCurrentInstance().closeDialog(null); //закрывает диалоговое окно
             //TODO: реализовать обновление главной формы
         } catch(Exception e){
             transaction.rollback();

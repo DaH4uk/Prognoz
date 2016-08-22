@@ -9,7 +9,7 @@ import javax.faces.bean.ManagedBean;
 import java.util.List;
 
 /**
- * @author:  Туров Данил
+ * Автор:  Туров Данил
  * Дата создания: 16.08.2016
  * Реализует data access object для AccountEntity,
  * скрывает реализацию методов для доступа к сущностям счетов клиентов.
@@ -25,7 +25,7 @@ public class AccountsDAO {
 
     /**
     * Конструктор DAO
-    * @param текущая сессия
+    * @param session текущая сессия
     */
     public AccountsDAO(Session session) {
         this.session = session;
@@ -33,7 +33,7 @@ public class AccountsDAO {
     
     /**
     * Реализует сохранение объекта в БД
-    * @param AccountEntity для сохранения его в бд
+    * @param dataSet для сохранения его в бд
     */
     public void save(AccountEntity dataSet) {
         session.save(dataSet);
@@ -53,7 +53,7 @@ public class AccountsDAO {
     * @param id клиента
     * @return List с обектами счетов
     */
-    public List<AccountEntity> readByAccountID(int id) {
+    public List<AccountEntity> readByClientId(int id) {
         Criteria criteria = session.createCriteria(AccountEntity.class);
 
         return (List<AccountEntity>) criteria.add(Restrictions.eq("client", id)).list();
