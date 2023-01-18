@@ -1,8 +1,6 @@
 package ru.prognoz.DAO;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import ru.prognoz.entities.ClientsEntity;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;

@@ -1,8 +1,12 @@
 package ru.prognoz.entities;
 
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
+import org.hibernate.annotations.Table;
+import org.springframework.data.annotation.Id;
 
 /**
  * @author:  Туров Данил
@@ -12,9 +16,9 @@ import javax.persistence.*;
  * The Prognoz Test Project
  */
 @Entity
-@Table(name = "accounts", schema = "prognoz")
+@Table(appliesTo = "account")
 public class AccountEntity {
-    private int id; //id счета
+    private long id; //id счета
     private int client; //id клиента
     private double sum; //сумма на счету
 
@@ -22,11 +26,11 @@ public class AccountEntity {
     @GenericGenerator(name="kaugen" , strategy="increment")
     @GeneratedValue(generator="kaugen")
     @Column(name = "id", nullable = false, unique = true)
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int accountId) {
+    public void setId(long accountId) {
         this.id = accountId;
     }
 
@@ -69,7 +73,7 @@ public class AccountEntity {
     public int hashCode() {
         int result;
         long temp;
-        result = id;
+        result = Math.toIntExact(id);
         result = 31 * result + client;
         temp = Double.doubleToLongBits(sum);
         result = 31 * result + (int) (temp ^ (temp >>> 32));

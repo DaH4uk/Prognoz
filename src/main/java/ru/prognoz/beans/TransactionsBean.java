@@ -9,11 +9,8 @@ import ru.prognoz.entities.ClientsEntity;
 import ru.prognoz.entities.TransactionsEntity;
 import ru.prognoz.hibertane.utils.HibernateSessionFactory;
 
+import javax.annotation.ManagedBean;
 import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.faces.model.SelectItem;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,7 +24,7 @@ import java.util.Map;
  * Реализует методы для управления формой с транзакциями.
  * The Prognoz Test Project
  */
-@ManagedBean(name = "transactionsView")
+@ManagedBean(value = "transactionsView")
 @ViewScoped
 public class TransactionsBean implements Serializable {
     private List<TransactionsEntity> transactions;  //Список транзакций
@@ -83,7 +80,7 @@ public class TransactionsBean implements Serializable {
         }
 
     }
-    
+
     //TODO: Реализовать метод поиска.
     public void search(){
         if (dateFrom != null && dateTo != null && id==0){
